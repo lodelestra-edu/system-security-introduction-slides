@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>Securité système</title>
+
+    <meta name="description" content="cours de rappel d'administration système">
+    <meta name="author" content="Loïc Delestra">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" ></meta>
+    <!-- <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> -->
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"> -->
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/beige.css" id="theme">
+
+    <link rel="stylesheet" href="css/custom.css">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <!-- Any section element inside of this container is displayed as a slide -->
+      <div class="slides">
+        <section data-markdown>
+          <script type="text/template">
+            #Sécurité système
+          </script>
+        </section>
+
+        <section data-markdown>
+          <script type="text/template">
+            <h4>Qui?</h4>
+            <h2>Loïc Delestra</h2>
+            <h4>travail</h4>
+            <h3>Ingénieur de recherche en sécurité mobile</h3><h3>LIMOS/Openium</h3>
+            <h4>Études</h4>
+            <h3>IUT de Clermont-Fd et ISIMA</h3>
+            <p>/*Le reste de mon CV est sur le net*/</p>
+          </script>
+        </section>
+
+        <section data-markdown>
+          <script type="text/template">
+            <h1>edu @ delestra.com</h1>
+
+            <p>@lodelestra</p>
+          </script>
+
+        </section>
+
+        <section>
+          <!-- <section data-background="img/calendar.jpg" class="invert-color"> -->
+          <section data-background="img/calendar.jpg">
+            <h1>programme</h1>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ##On commence par quoi?
+              <img src="img/where_we_start.gif" alt="where we start?">
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ###Liste non ordonnée et non exhaustive
+              - Historique, culture sécu et institutions
+              - Firewall (et méthodologie de configuration)
+              - Outils de scans et d'analyse
+              - Exploits (ce vieux Bof)
+              - Durcissement d'un GNU/Linux
+              - Les VPN, DMZ et leurs mises en place
+              - Certificats et PKI
+              - Procédure de test d'intrusion
+              - Containers. Exemple avec docker
+              - IDS, IPS
+              - Système de journalisation
+              - Analyse de risque
+              - ...
+
+            </script>
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            <script type="text/template">
+              #1. Introduction
+            </script>
+          </section>
+
+          <section data-markdown style="text-align: left;">
+            <script type="text/template">
+              ##Historique sécurité système
+              ###Au début des années 90
+              Encore peu d'ordinateurs personnels.
+              Traitement informatique dans les entreprises, universités, et organisations.
+                - Systèmes multi-utilisateurs
+                - isolées, pas connecté au réseau
+
+              La sécurité se concentrait sur comment empecher un utlisateur de sortir de son domaine.
+
+              - s'assurer que les utilisateurs ne peuvent pas lire et falsifier les fichiers des autres.
+              - autoriser le partage de certains fichiers
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ###En approchant des années 2000
+              L'utilisation des ordinateurs personnels et d'internet, le déclin des ordinateurs partagé (sauf à l'ISIMA).
+              - Les problématiques de cloisonnement des utilisateurs disparaissent
+              - Les attaques en provenance de l'extérieur augmentent.
+              - L'augmentation du nombre et de la taille des logiciels augmente également la surface d'attaque.
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ##les objectifs de sécurité
+              Les systèmes informatiques ont généralement 4 objectifs de sécurité :
+              - **confidentialité des données** : les données ne seront visibles que par les personnes autorisées.
+              - **intégrité des données** : impossibilité de modification sans autorisation.
+              - **disponibilité du système** : personne ne peut rendre le système inutilisable.
+              - **Accès interdit aux inconnus** : ne pas faire partie du botnet.
+            </script>
+          </section>
+
+
+          <section data-markdown>
+            <script type="text/template">
+              ##les menaces
+              Objectif|Menace
+              --- | ---
+              Confidentialité des données | Divulgation des données
+              Intégrité des données | Falsification des données
+              Disponibilité du système | Deni de service
+              Accès interdit aux inconnus | Prise de contrôle du système
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ##Les intrus / adversaires
+              Alert scoop :<br>il existe des personnes avec des intentions malhonnêtes!
+
+              Par idéologie, activisme, ou pour l’argent.
+
+              - Les intrus passifs : consulte les fichiers pour lesquels ils ne possèdent pas d'autorisation
+              - Les intrus actifs : Cherche à apporter des modifications aux données.
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ##Les types d'intrus
+              1. Intrusion fortuite par des utilisateurs non-techniciens (erreur de configuration).
+              2. Espionnage de la part d'initiés. Personnes hautement qualifiées mises au défi personnel de casser la sécurité du système informatique local.
+              3. Tentatives pour gagner de l'argent. Carder, ransomware, etc.
+              4. Espionnage commercial ou militaire. Concurrent ou puissance étrangère.
+
+              Les moyens de ces intrus ne sont pas les mêmes. La réponse à apporter non plus.
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              <img src="img/american_ambassade.jpg" alt="ambassade americaine Paris">
+              SCS : Special Collection Service
+            </script>
+          </section>
+
+
+          <section data-markdown>
+            <script type="text/template">
+              ##Les pertes accidentelles de données
+              1. Force majeure : inondations, incendies...
+              2. Erreurs matérielles ou logicielles : défaillances disques, erreurs de transmission...
+              3. Erreurs humaines : saisie incorrectes, perte de disque, de clé, de laptop...
+
+              Dans la pratique, ce sont les pertes accidentelles qui provoquent beaucoup plus de dommages que les intrus.
+            </script>
+          </section>
+
+
+          <!-- <section data-markdown data-background="img/the_good_the_bad_the_ugly.jpg"> -->
+          <!-- <section data-markdown >
+            <script type="text/template">
+              ##Une histoire de pirate
+              <img src="img/the_good_the_bad_the_ugly.jpg" alt="le bon la brute et le truand">
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ###Distribution des roles (caricatures):
+              - Le **White hat**: hacker qui pénètre dans un système informatique en causant des dégâts limités. Son objectif principal est d'aider leur propriétaire à mieux le sécuriser.
+              - Le **Script kiddies**: hacker peu compétent réalisant des exploits par pure vantardise en utilisant des outils fournis par d'autres. Les puristes ne les considèrent pas comme de réels hackers.
+              - Le **Black Hat**: hacker qui s’introduit sur les systèmes informatiques avec l’intention de nuire. Sa motivation est parfois criminelle.
+
+              Leurs point commun étant de se revandiquer hacker.
+            </script>
+          </section>
+
+
+          <section data-markdown>
+            <script type="text/template">
+            </script>
+          </section> -->
+
+        </section>
+
+        <!-- <section>
+          <section data-markdown>
+            <script type="text/template">
+
+            </script>
+          </section>
+          <section data-markdown>
+            <script type="text/template">
+            </script>
+          </section>
+          <section data-markdown>
+            <script type="text/template">
+            </script>
+          </section>
+        </section> -->
+
+        <section>
+          <section data-markdown>
+            <script type="text/template">
+              #2 Rappel : Configuration réseau
+            </script>
+          </section>
+
+          <section>
+            <h2>Configuration de l'interface réseau</h2>
+            <h3>Adresse IP</h3>
+            <pre><code data-trim>
+ifconfig < interface > < adresse ip >
+            </code></pre>
+
+            <pre><code data-trim>
+ifconfig eth0 192.168.1.2
+ifconfig eth0 192.168.1.12 netmask 255.255.255.128
+            </code></pre>
+            <h3>Routage</h3>
+            <pre><code data-trim>
+#Ajout d'un route
+route add default gw < adresse ip >
+#liste des routes
+route -n
+            </code></pre>
+          </section>
+
+          <section>
+            <h3>Configuration automatique</h3>
+            <p>/etc/network/interfaces</p>
+            <pre><code data-trim>
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+  address 192.168.1.2
+  netmask 255.255.255.0
+  gateway 192.168.1.1
+            </code></pre>
+          </section>
+
+          <section>
+          <h2>Résolution de noms d'hôte</h2>
+          <p>/etc/host.conf</p>
+          <pre><code data-trim>
+# D'abord traduire avec les serveurs DNS et ensuite avec /etc/hosts.
+order bind,hosts
+          </code></pre>
+
+          <h3>Serveurs DNS</h3>
+          <p>/etc/resolv.conf</p>
+          <pre><code data-trim>
+nameserver 208.164.186.1
+nameserver 208.164.186.2
+          </code></pre>
+
+          <h3>fichier hosts</h3>
+          <p>/etc/hosts</p>
+          <pre><code data-trim>
+192.168.10.42 leon
+          </code></pre>
+          </section>
+        </section>
+
+        <section>
+          <section data-markdown>
+            <script type="text/template">
+              #3. Netfilter
+              ###firewall
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ##Filtrage
+              Netfilter permet de jeter ou de laisser passer les paquets qui entrent et qui sortent.
+              ###Trois chaînes principales :
+              - **INPUT** : les paquets à destination du système
+              - **OUTPUT** : les paquets émis par les processus du système
+              - **FORWARD** :  les paquets que le système doit transmettre
+
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              <img src="img/Netfilter_schema_-_Filter_table_only.png" alt="">
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ###Chaîne
+              Une chaîne est un ensemble de règles qui indiquent ce qu'il faut faire des paquets qui la traversent.
+              <br>
+              **Lorsqu'un paquet arrive dans une chaîne :**
+              1. Netfilter regarde la 1ère règle de la chaîne,
+              2. puis regarde si les critères de la règle correspondent au paquet.
+              3. Si le paquet correspond, la cible est exécutée (jeter le paquet, le laisser passer, etc.).
+              4. Sinon, Netfilter prend la règle suivante et la compare de nouveau au paquet. Et ainsi de suite jusqu'à la dernière règle.
+              5. Si aucune règle n'a interrompu le parcours de la chaîne, la politique par défaut est appliquée.
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ###Règles
+              - Une règles est une combinaison de critères et une cible.
+              - Lorsque **tous** les critères correspondent au paquet, le paquet est envoyé vers la cible.
+              - Les critères disponibles et les actions possibles dépendent de la chaîne manipulée.
+            </script>
+          </section>
+
+          <section>
+              <h2>Syntaxe</h2>
+              <pre><code data-trim>
+iptables [-t < table>] < commande> < options>
+              </code></pre>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ##Liste des commandes
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              - `--list|-L [<chaîne>]` Affiche les règles contenues dans les chaînes ou seulement dans la chaîne sélectionnée.
+              - `--append|-A <chaîne> <critères> -j <cible>` Ajoute une règle à la fin de la chaîne < chaine>.
+              - `--insert|-I <chaîne> <critères> -j <cible>` Comme --append mais ajoute la règle au début de la chaîne.
+              - `--delete|-D <chaîne> <critères> -j <cible>` Supprime la règle correspondante de la chaîne.
+              - `--flush|-F [<chaîne>]` Efface toutes les règles de la chaîne. Si aucune chaîne n'est indiquée, toutes les chaînes de la table seront vidées.
+              - `--policy|-P <chaîne> <cible>` Détermine la cible lorsque qu'aucune règle n'a interrompu le parcours et que le paquet arrive en fin de chaîne.
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ##Liste des critères
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              - `--protocol|-p [!] <protocole>` Les protocoles possibles sont tcp, udp, icmp, all ou une valeur numérique. Les valeurs de /etc/protocols sont aussi utilisables
+              - `--source|-s [!] <adresse>[/<masque>]` L'adresse source est <adresse>. Le masque par défaut est /32.
+              - `--destination|-d [!] <adresse>[/<masque>]` item source mais pour la destination.
+              - `--dport [!] <port>` Le port destination est < port>.
+              - `--sport [!] <port>` Le port source est < port>.
+              - `-i <interface>` L'interface réseau d'où provient le paquet. N'est utilisable que dans la chaîne INPUT.
+              - `-o <interface>` L'interface réseau de laquelle va partir le paquet. N'est utilisable que dans les chaînes OUTPUT et FORWARD.
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ##Liste des cibles 
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              - `-j ACCEPT` autorise le paquet à passer et interrompt son parcours de la chaîne.
+              - `-j DROP` Jette le paquet sans prévenir l'émetteur. Le parcours de la chaîne est interrompu.
+              - `-j REJECT` Comme DROP mais prévient l'émetteur que le paquet est rejeté.
+            </script>
+          </section>
+
+
+
+        </section>
+
+        <section>
+          <section data-markdown>
+            <script type="text/template">
+              ##Sources :
+              <br>
+              Système d'exploitation A.Tanenbaum
+              <br>
+              <br>
+              https://fr.wikibooks.org/wiki/Administration_réseau_sous_Linux
+            </script>
+          </section>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="lib/js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        slideNumber: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+        { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+        { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+        { src: 'plugin/zoom-js/zoom.js', async: true },
+        { src: 'plugin/notes/notes.js', async: true }
+        ]
+        });
+
+      </script>
+
+  </body>
+</html>
