@@ -415,10 +415,117 @@ iptables [-t < table>] < commande> < options>
               - `-j REJECT` Comme DROP mais prévient l'émetteur que le paquet est rejeté.
             </script>
           </section>
+        </section>
 
+        <section>
+          <section data-markdown>
+            <script type="text/template">
+              #4. nmap
+              ###Network Mapper
+            </script>
+          </section>
 
+          <section data-markdown>
+            <script type="text/template">
+              >Nmap (“Network Mapper”) is an open source tool for network exploration and security auditing. It was designed to rapidly scan large networks, although it works fine against single hosts. 
+
+              ####man
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              `nmap [Scan Type...] [Options] {target specification}`
+
+              example:
+              ```sh
+              $ nmap -A -p 1-65535 -T5 192.168.1.2
+              Nmap scan report for 192.168.1.2
+              Host is up (0.00013s latency).
+              Not shown: 65505 closed ports
+              PORT      STATE SERVICE
+              21/tcp    open  ftp
+              22/tcp    open  ssh
+              23/tcp    open  telnet
+              25/tcp    open  smtp
+              53/tcp    open  domain
+              80/tcp    open  http
+              111/tcp   open  rpcbind
+              139/tcp   open  netbios-ssn
+              445/tcp   open  microsoft-ds
+              512/tcp   open  exec
+              513/tcp   open  login
+              514/tcp   open  shell
+              1099/tcp  open  rmiregistry
+              1524/tcp  open  ingreslock
+              2049/tcp  open  nfs
+              2121/tcp  open  ccproxy-ftp
+              3306/tcp  open  mysql
+              3632/tcp  open  distccd
+              5432/tcp  open  postgresql
+              5900/tcp  open  vnc
+              6000/tcp  open  X11
+              6667/tcp  open  irc
+              6697/tcp  open  unknown
+              8009/tcp  open  ajp13
+              8180/tcp  open  unknown
+              8787/tcp  open  unknown
+              36861/tcp open  unknown
+              39060/tcp open  unknown
+              39748/tcp open  unknown
+              52999/tcp open  unknown
+              MAC Address: 08:00:27:B7:7C:29 (Cadmus Computer Systems)
+              ```
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ###useful options
+              - **-A**: Aggressive scan options. Presently this enables OS detection (-O), version scanning (-sV), script scanning (-sC) and traceroute (--traceroute)
+              - **-sS**: (TCP SYN scan). This technique is often referred to as half-open scanning, because you don't open a full TCP connection
+              - **-p**: port rang
+              - **-n**: disable DNS resolution (speed up scans)
+              - **-Pn**: disable ping
+              - **-pS**: TCP SYNPing
+              - **-oA < file>**: export all types of reports
+              - **-T< 0-5>**: Set timing template (higher is faster) 
+            </script>
+          </section>
+        </section>
+
+        <section>
+
+          <section data-markdown>
+            <script type="text/template">
+              #5. Metasploit
+              ###Exploit framework
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              >The Metasploit Project is a computer security project that provides information about security vulnerabilities and aids in penetration testing and IDS signature development.
+              wikipedia
+            </script>
+          </section>
+
+          <section data-markdown>
+            <script type="text/template">
+              ## msfconsole useful commands
+              - **search**: Searches module names and descriptions
+              - **use**: Selects a module by name
+              - **back**: Move back from the current context
+              - **set**: Sets a context-specific variable to a value
+              - **show**: Displays modules of a given type, or all modules
+              - **sessions**: Dump session listings and display information about sessions
+              - **exploit**: start the exploit
+            </script>
+          </section>
 
         </section>
+
+
 
         <section>
           <section data-markdown>
